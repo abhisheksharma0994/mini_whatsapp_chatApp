@@ -1,0 +1,102 @@
+<meta charset="utf-8">
+
+<style>
+.left{
+float:left;
+}
+.right{
+float:right;
+}
+.pic{
+display: block;
+    max-width:90%;
+    max-height:90%;
+    width: auto;
+    height: auto;
+
+}
+#box{
+border-style:dashed;
+overflow:scroll;
+width:97%;
+height:75%;
+}
+#full{
+width:75%;
+height:97%;
+
+border-style:solid;
+}
+
+</style>
+<script src="jquery.min.js"></script>
+<center>
+<div id='full'>
+
+<h1>CHATAPP</h1>
+
+
+
+Enter message and press enter : 
+
+<input id=input placeholder=you-chat-here />
+ <input id=pic placeholder=image-link-&-enter-key />
+ <button id='export'>Export Chat</button><br>
+
+<div id=box></div>
+
+
+ 
+<script src=pubnub.min.js></script>
+<script>
+
+
+
+$('#export').on('click',function(){
+var a = document.body.appendChild(
+        document.createElement("a")
+    );
+a.download = "export.html";
+a.href = "data:text/html," + document.getElementById("box").innerHTML;
+a.innerHTML = "[Export conent]";
+a.click();
+$('a').remove();
+});
+
+</script>
+<script>(function(){
+
+
+channel_name=prompt('Enter secret room name ');
+var uname=prompt('Enter your name ');
+alternate=0;
+loc='';
+var box = PUBNUB.$('box'), input = PUBNUB.$('input'), pic=PUBNUB.$('pic'),channel =channel_name ;
+
+PUBNUB.subscribe({
+channel : channel,
+callback : function(text) { box.innerHTML += '<br>'+text ;
+	
+ $('#box').animate({
+        scrollTop: $('#box')[0].scrollHeight}, 2000);
+
+ },
+
+});
+PUBNUB.bind( 'keyup', input, function(e) {
+(e.keyCode || e.charCode) === 13 && PUBNUB.publish({
+channel : channel, message : uname+' : '+input.value, x : (input.value='')
+})
+} )
+PUBNUB.bind( 'keyup', pic, function(e) {
+(e.keyCode || e.charCode) === 13 && PUBNUB.publish({
+channel : channel, message : uname+' : <img class="pic" src="'+pic.value+'" >', x : (input.value=''),
+callback:function(){ pic.value='' }
+})
+} )
+})()</script> 
+
+
+
+</div>
+    </center>
